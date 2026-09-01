@@ -6,7 +6,7 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
-    "build": "nest build",
+    "build": "nest build --tsc-config tsconfig.json",
     "start": "nest start",
     "start:dev": "nest start --watch",
     "start:staging": "NODE_ENV=staging node dist/main",
