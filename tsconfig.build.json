@@ -5,7 +5,8 @@
     "strictNullChecks": false,
     "strict": false,
     "rootDir": "./src",
-    "ignoreDeprecations": "6.0"
+    "moduleResolution": "node",
+    "skipLibCheck": true
   },
   "exclude": ["node_modules", "test", "dist", "**/*spec.ts"]
 }
