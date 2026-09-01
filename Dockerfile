@@ -3,7 +3,8 @@ WORKDIR /usr/src/app
 COPY package*.json ./
 RUN npm ci
 COPY . .
-RUN npm run build
+RUN npx tsc --version
+RUN node_modules/.bin/nest build --tsc-config tsconfig.build.json
 
 FROM node:20-alpine AS runner
 WORKDIR /usr/src/app
