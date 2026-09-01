@@ -3,7 +3,9 @@
   "compilerOptions": {
     "strictPropertyInitialization": false,
     "strictNullChecks": false,
-    "strict": false
+    "strict": false,
+    "rootDir": "./src",
+    "ignoreDeprecations": "5.0"
   },
   "exclude": ["node_modules", "test", "dist", "**/*spec.ts"]
 }
