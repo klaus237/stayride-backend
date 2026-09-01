@@ -2,7 +2,7 @@
   "name": "stayride-backend",
   "version": "1.0.0",
   "scripts": {
-    "build": "tsc -p tsconfig.json && cp -r src/modules/notifications/templates dist/modules/notifications/ 2>/dev/null || nest build",
+    "build": "nest build",
     "start": "nest start",
     "start:dev": "nest start --watch",
     "start:prod": "NODE_ENV=production node dist/main"
