@@ -35,7 +35,12 @@ async function bootstrap() {
   app.enableCors({
     origin:
       nodeEnv === "production"
-        ? [frontendUrl, "https://stayride.cm", "https://www.stayride.cm"]
+        ? [
+            frontendUrl,
+            "https://stayride.cm",
+            "https://www.stayride.cm",
+            "https://stayride.netlify.app",
+          ]
         : true,
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization", "Accept-Language"],
