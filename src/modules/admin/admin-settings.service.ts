@@ -19,16 +19,16 @@ import {
 @Entity('platform_settings')
 export class PlatformSettingEntity {
   @PrimaryColumn()
-  key: string;
+  key!: string;
 
   @Column({ type: 'jsonb' })
   value: any;
 
   @Column({ nullable: true })
-  description: string;
+  description!: string;
 
   @Column({ name: 'updated_by', nullable: true })
-  updatedBy: string;
+  updatedBy!: string;
 
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;

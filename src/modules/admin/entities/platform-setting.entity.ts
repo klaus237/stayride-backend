@@ -3,13 +3,13 @@ import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateCol
 @Entity('platform_settings')
 export class PlatformSettingEntity {
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  id!: string;
 
   @Column({ unique: true })
-  key: string;
+  key!: string;
 
   @Column({ type: 'text', nullable: true })
-  value: string;
+  value!: string;
 
   @Column({ nullable: true })
   description: string;
