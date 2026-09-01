@@ -1,6 +1,11 @@
-import { Injectable, OnModuleDestroy, OnModuleInit, Logger } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import Redis from 'ioredis';
+import {
+  Injectable,
+  OnModuleDestroy,
+  OnModuleInit,
+  Logger,
+} from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
+import Redis from "ioredis";
 
 @Injectable()
 export class RedisService implements OnModuleInit, OnModuleDestroy {
@@ -10,16 +15,24 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
   constructor(private configService: ConfigService) {}
 
   async onModuleInit() {
-    this.client = new Redis({
-      host: this.configService.get('REDIS_HOST', 'localhost'),
-      port: this.configService.get<number>('REDIS_PORT', 6379),
-      password: this.configService.get('REDIS_PASSWORD') || undefined,
-      retryStrategy: (times) => Math.min(times * 100, 3000),
-      maxRetriesPerRequest: 3,
-    });
+    const redisUrl = this.configService.get("REDIS_URL");
 
-    this.client.on('connect', () => this.logger.log('Redis connecté'));
-    this.client.on('error', (err) => this.logger.error('Redis erreur', err));
+    this.client = redisUrl
+      ? new Redis(redisUrl, {
+          retryStrategy: (times) => Math.min(times * 100, 3000),
+          maxRetriesPerRequest: 3,
+          tls: redisUrl.startsWith("rediss://") ? {} : undefined,
+        })
+      : new Redis({
+          host: this.configService.get("REDIS_HOST", "localhost"),
+          port: this.configService.get<number>("REDIS_PORT", 6379),
+          password: this.configService.get("REDIS_PASSWORD") || undefined,
+          retryStrategy: (times) => Math.min(times * 100, 3000),
+          maxRetriesPerRequest: 3,
+        });
+
+    this.client.on("connect", () => this.logger.log("Redis connecté"));
+    this.client.on("error", (err) => this.logger.error("Redis erreur", err));
   }
 
   async onModuleDestroy() {
@@ -59,12 +72,12 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
     // NX = seulement si la clé n'existe pas (atomique)
     const result = await this.client.set(
       `lock:${key}`,
-      '1',
-      'EX',
+      "1",
+      "EX",
       ttlSeconds,
-      'NX',
+      "NX",
     );
-    return result === 'OK';
+    return result === "OK";
   }
 
   async releaseLock(key: string): Promise<void> {
@@ -93,10 +106,14 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
     carId: string,
     location: { lat: number; lng: number; speed?: number },
   ): Promise<void> {
-    await this.setJson(`car:location:${carId}`, {
-      ...location,
-      updatedAt: new Date().toISOString(),
-    }, 60); // TTL 60s — écrasé à chaque mise à jour
+    await this.setJson(
+      `car:location:${carId}`,
+      {
+        ...location,
+        updatedAt: new Date().toISOString(),
+      },
+      60,
+    ); // TTL 60s — écrasé à chaque mise à jour
   }
 
   async getCarLocation(carId: string): Promise<{
@@ -111,7 +128,7 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
   // ─── Blacklist JWT (logout) ───────────────────────────────────────────────
 
   async blacklistToken(jti: string, ttlSeconds: number): Promise<void> {
-    await this.set(`blacklist:${jti}`, '1', ttlSeconds);
+    await this.set(`blacklist:${jti}`, "1", ttlSeconds);
   }
 
   async isTokenBlacklisted(jti: string): Promise<boolean> {
@@ -121,14 +138,14 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
   // ─── Cache settings plateforme ────────────────────────────────────────────
 
   async cacheSettings(settings: Record<string, any>): Promise<void> {
-    await this.setJson('platform:settings', settings, 300); // 5 min
+    await this.setJson("platform:settings", settings, 300); // 5 min
   }
 
   async getCachedSettings(): Promise<Record<string, any> | null> {
-    return this.getJson('platform:settings');
+    return this.getJson("platform:settings");
   }
 
   async invalidateSettingsCache(): Promise<void> {
-    await this.del('platform:settings');
+    await this.del("platform:settings");
   }
 }

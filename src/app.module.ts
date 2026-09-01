@@ -33,22 +33,34 @@ import { AdminModule } from "./modules/admin/admin.module";
     // PostgreSQL via TypeORM
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
-      useFactory: (config: ConfigService) => ({
-        type: "postgres",
-        host: config.get("DB_HOST", "localhost"),
-        port: config.get<number>("DB_PORT", 5432),
-        database: config.get("DB_NAME"),
-        username: config.get("DB_USER"),
-        password: config.get("DB_PASSWORD"),
-        entities: [__dirname + "/modules/**/*.entity{.ts,.js}"],
-        migrations: [__dirname + "/database/migrations/*{.ts,.js}"],
-        synchronize: config.get("DB_SYNCHRONIZE", "false") === "true",
-        logging: config.get("NODE_ENV") === "development",
-        ssl:
-          config.get("NODE_ENV") === "production"
-            ? { rejectUnauthorized: false }
-            : false,
-      }),
+      useFactory: (config: ConfigService) => {
+        const databaseUrl = config.get("DATABASE_URL");
+        if (databaseUrl) {
+          return {
+            type: "postgres",
+            url: databaseUrl,
+            entities: [__dirname + "/modules/**/*.entity{.ts,.js}"],
+            synchronize: true,
+            logging: false,
+            ssl: { rejectUnauthorized: false },
+          };
+        }
+        return {
+          type: "postgres",
+          host: config.get("DB_HOST", "localhost"),
+          port: config.get<number>("DB_PORT", 5432),
+          database: config.get("DB_NAME"),
+          username: config.get("DB_USER"),
+          password: config.get("DB_PASSWORD"),
+          entities: [__dirname + "/modules/**/*.entity{.ts,.js}"],
+          synchronize: config.get("DB_SYNCHRONIZE", "false") === "true",
+          logging: config.get("NODE_ENV") === "development",
+          ssl:
+            config.get("NODE_ENV") === "production"
+              ? { rejectUnauthorized: false }
+              : false,
+        };
+      },
       inject: [ConfigService],
     }),
 
