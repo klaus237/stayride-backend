@@ -39,7 +39,7 @@ async function bootstrap() {
             frontendUrl,
             "https://stayride.cm",
             "https://www.stayride.cm",
-            "https://stayride.netlify.app",
+            "https://stayride-app.vercel.app",
           ]
         : true,
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
